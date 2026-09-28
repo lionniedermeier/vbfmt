@@ -39,7 +39,7 @@ Module LeadingComments
 
     Public Sub HandlesCommentedFooter()
         Dim value = 1
-    ' A comment above the block's own closing statement.
+        ' A comment above the block's own closing statement.
     End Sub
 
 End Module

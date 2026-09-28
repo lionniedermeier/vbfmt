@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using VisualBasicFormatter.Language.Statements;
 using VisualBasicFormatter.Printing;
 
 namespace VisualBasicFormatter.Language.Declarations;
@@ -39,8 +40,7 @@ internal static class MemberSpacingRule
         return Doc.Concat(
             header,
             Doc.Indent(body.ToDoc()),
-            BeforeFooter(padded),
-            visitor.Format(footer)
+            BlockRule.Footer(footer, visitor, context, BeforeFooter(padded))
         );
     }
 

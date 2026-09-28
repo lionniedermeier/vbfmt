@@ -21,7 +21,7 @@ Public Class LambdaBlocks
             paramA,
             Sub(someParam)
                 Work(someParam)
-            ' about to return
+                ' about to return
             End Sub
         )
     End Sub

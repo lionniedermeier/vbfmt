@@ -94,7 +94,7 @@ internal sealed partial class VbDocVisitor
             BlockRule.Body(node.Statements, this, _context),
             StatementListRule.Format(node.ElseIfBlocks, this, _context),
             StatementListRule.Format(node.ElseBlock, this, _context),
-            StatementListRule.Format(node.EndIfStatement, this, _context)
+            BlockRule.Footer(node.EndIfStatement, this, _context)
         );
 
     /// <inheritdoc/>
@@ -138,7 +138,7 @@ internal sealed partial class VbDocVisitor
             BlockRule.Body(node.Statements, this, _context),
             StatementListRule.Format(node.CatchBlocks, this, _context),
             StatementListRule.Format(node.FinallyBlock, this, _context),
-            StatementListRule.Format(node.EndTryStatement, this, _context)
+            BlockRule.Footer(node.EndTryStatement, this, _context)
         );
 
     /// <inheritdoc/>

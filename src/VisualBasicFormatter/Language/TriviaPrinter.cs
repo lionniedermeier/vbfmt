@@ -29,11 +29,24 @@ internal static class TriviaPrinter
         int blankAfter = -1
     )
     {
+        var (content, closingBreak) = Split(trivia, count, blankAfter);
+        return Doc.Concat(content, closingBreak);
+    }
+
+    public static (Doc Content, Doc Break) Dangling(SyntaxToken token) =>
+        Split(token.LeadingTrivia, token.LeadingTrivia.Count, -1);
+
+    private static (Doc Content, Doc Break) Split(
+        SyntaxTriviaList trivia,
+        int count,
+        int blankAfter
+    )
+    {
         // The overwhelmingly common case: indentation and blank lines only, nothing to print above
         // the token. Answered without allocating a builder.
         if (!HasPrintableTrivia(trivia, count))
         {
-            return Doc.Nothing;
+            return (Doc.Nothing, Doc.Nothing);
         }
 
         var parts = ImmutableArray.CreateBuilder<Doc>();
@@ -72,13 +85,10 @@ internal static class TriviaPrinter
             lastContentIndex = i;
         }
 
-        if (written)
-        {
-            var forced = lastContentIndex < blankAfter;
-            parts.Add(blankLines > 0 || forced ? Doc.EmptyLine : Doc.HardLine);
-        }
+        var closingBreak =
+            blankLines > 0 || lastContentIndex < blankAfter ? Doc.EmptyLine : Doc.HardLine;
 
-        return Doc.Concat(parts.DrainToImmutable());
+        return (Doc.Concat(parts.DrainToImmutable()), closingBreak);
     }
 
     /// <summary>

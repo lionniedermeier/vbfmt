@@ -19,13 +19,43 @@ internal static class BlockRule
         FormatContext context
     )
         where T : SyntaxNode =>
-        Doc.Concat(
-            header,
-            Body(body, visitor, context),
-            StatementListRule.Format(footer, visitor, context)
-        );
+        Doc.Concat(header, Body(body, visitor, context), Footer(footer, visitor, context));
 
     /// <summary>The body of a block, one level deeper than its header.</summary>
     public static Doc Body<T>(SyntaxList<T> body, VbDocVisitor visitor, FormatContext context)
         where T : SyntaxNode => Doc.Indent(StatementListRule.Format(body, visitor, context));
+
+    public static Doc Footer(
+        SyntaxNode? footer,
+        VbDocVisitor visitor,
+        FormatContext context,
+        Doc? separator = null
+    )
+    {
+        if (footer is null)
+        {
+            return Doc.Nothing;
+        }
+
+        separator ??= context.Separator(footer);
+        var first = footer.GetFirstToken();
+
+        if (context.IsIgnored(footer))
+        {
+            return Doc.Concat(separator, visitor.Format(footer));
+        }
+
+        var (content, closingBreak) = TriviaPrinter.Dangling(first);
+
+        if (Doc.IsNothing(content))
+        {
+            return Doc.Concat(separator, visitor.Format(footer));
+        }
+
+        var previous = context.Hoist(first);
+        var body = visitor.Format(footer);
+        context.Restore(previous);
+
+        return Doc.Concat(Doc.Indent(separator, content), closingBreak, body);
+    }
 }
