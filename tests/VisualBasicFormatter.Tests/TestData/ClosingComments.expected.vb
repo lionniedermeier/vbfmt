@@ -1,5 +1,4 @@
 Public Class ClosingComments
-
     Public Function CommentDedentBug()
         If A Then
 
@@ -73,7 +72,6 @@ Public Class ClosingComments
     Public Sub InRegion()
         DoSomething()
     End Sub
-
     ' Comment before End Region
 #End Region
     ' Comment before End Class

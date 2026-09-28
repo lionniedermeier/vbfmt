@@ -6,7 +6,6 @@ Imports System.Runtime.InteropServices
 
 <Serializable>
 Public Class Employee
-
     <NonSerialized>
     Private _cache As String
 
@@ -32,7 +31,6 @@ Public Class Employee
             Return _cache
         End Get
     End Property
-
 End Class
 
 Public Module EmployeeExtensions

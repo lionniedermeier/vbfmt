@@ -1,5 +1,4 @@
 Module SelectCaseInline
-
     Public Function Indent(ByVal depth As Integer) As String
         Select Case depth
             Case 0 : Return ""
@@ -72,5 +71,4 @@ Module SelectCaseInline
                 Return True
         End Select
     End Function
-
 End Module

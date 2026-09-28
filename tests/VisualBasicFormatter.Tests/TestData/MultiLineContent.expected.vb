@@ -1,7 +1,6 @@
 Imports System.Xml.Linq
 
 Module MultiLineContent
-
     Sub Diagnostics()
         Assert.Equal(
             <text>
@@ -43,5 +42,4 @@ end"
         If True Then Console.WriteLine("line one   
 line two")
     End Sub
-
 End Module

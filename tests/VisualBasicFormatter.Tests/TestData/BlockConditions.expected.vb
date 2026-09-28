@@ -1,5 +1,4 @@
 Module BlockConditions
-
     Public Function Classify(ByVal candidate As Contract) As String
         If candidate.IsActive AndAlso
                 candidate.HasValidSignature AndAlso
@@ -85,5 +84,4 @@ Module BlockConditions
 
         Return False
     End Function
-
 End Module

@@ -1,7 +1,6 @@
 Imports System.Xml.Linq
 
 Module Roster
-
     Private _employees As List(Of Employee)
 
     Public Function Build() As XElement
@@ -33,5 +32,4 @@ Module Roster
             <b/>
         </a>
     End Function
-
 End Module

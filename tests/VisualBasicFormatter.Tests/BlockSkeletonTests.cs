@@ -107,7 +107,6 @@ public sealed class BlockSkeletonTests
                 Public Function Describe() As String ' trailing comment
                     Return "worker"
                 End Function
-
             End Class
 
             Public Structure Point

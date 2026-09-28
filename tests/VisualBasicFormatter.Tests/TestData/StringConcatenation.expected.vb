@@ -1,5 +1,4 @@
 Module Concatenation
-
     Public Sub Queries(ByVal identifier As Integer, ByVal name As String)
         Dim sqlQueryExpressionAsString = "select id, name, address, salary" & "from employees"
 
@@ -56,5 +55,4 @@ Module Concatenation
         target &= "alpha" &
             name
     End Sub
-
 End Module

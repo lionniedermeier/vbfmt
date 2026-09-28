@@ -25,7 +25,8 @@ internal sealed partial class VbDocVisitor
             node.Members,
             node.EndNamespaceStatement,
             this,
-            _context
+            _context,
+            padded: node.Members.Count > 1
         );
 
     /// <inheritdoc/>

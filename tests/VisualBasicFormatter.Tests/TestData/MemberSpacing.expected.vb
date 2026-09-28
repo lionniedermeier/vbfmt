@@ -25,7 +25,6 @@ Namespace Tracker.Core
         ''' </summary>
         Public Function DoSomething() As String
         End Function
-
     End Class
 End Namespace
 
@@ -34,6 +33,20 @@ Namespace Tracker.Single
         Public Sub Run()
         End Sub
     End Class
+End Namespace
+
+Namespace Tracker.Multi
+
+    Public Class First
+        Public Sub Run()
+        End Sub
+    End Class
+
+    Public Class Second
+        Public Sub Run()
+        End Sub
+    End Class
+
 End Namespace
 
 Namespace Tracker.Empty
@@ -48,7 +61,6 @@ Public Class OnlyInherits
 End Class
 
 Public Interface IWorker
-
     Sub Run()
 
     Function Compute() As Integer
@@ -56,19 +68,15 @@ Public Interface IWorker
     Property Total As Integer
 
     Event Done As EventHandler
-
 End Interface
 
 Public MustInherit Class WorkerBase
-
     Public MustOverride Sub Run()
 
     Public MustOverride Function Compute() As Integer
-
 End Class
 
 Public Class WithNested
-
     Public Enum Status
         Active
         Inactive
@@ -78,11 +86,9 @@ Public Class WithNested
         Public Sub Run()
         End Sub
     End Class
-
 End Class
 
 Public Class WithRegion
-
     Private _a As Integer
 
 #Region "Helpers"
@@ -93,7 +99,6 @@ Public Class WithRegion
     ' A plain comment above a method.
     Public Sub Run()
     End Sub
-
 End Class
 
 Public Class First
@@ -135,10 +140,8 @@ Public Class DocumentedProperties
 End Class
 
 Public Class MixedPropertyAndField
-
     Public Property Id As Integer
     Private _cache As Integer
-
 End Class
 
 Public Class DocumentedFirstMember
@@ -149,7 +152,6 @@ Public Class DocumentedFirstMember
     End Sub
 
     Private _count As Integer
-
 End Class
 
 Public Structure DocumentedFirstField
@@ -159,7 +161,6 @@ Public Structure DocumentedFirstField
     Public X As Integer
 
     Public Y As Integer
-
 End Structure
 
 Public Class ImplementsDocumentedFirstMember
@@ -172,5 +173,4 @@ Public Class ImplementsDocumentedFirstMember
     End Sub
 
     Private _count As Integer
-
 End Class

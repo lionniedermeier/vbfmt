@@ -1,5 +1,4 @@
 Public Class Form1
-
     Private WithEvents A________ As Button
     Private WithEvents B_________ As Button
     Private WithEvents C_________ As Button
@@ -45,5 +44,4 @@ Public Class Form1
     Private Sub ShortHandler(sender As Object, e As EventArgs) Handles A________.Click, B_________.Click
         DoSomething()
     End Sub
-
 End Class

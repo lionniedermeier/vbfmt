@@ -1,7 +1,6 @@
 Imports System.Xml.Linq
 
 Module Tags
-
     Public Function Wide(employee As Employee) As XElement
         Return <employee
             id=<%= employee.Id %>
@@ -25,5 +24,4 @@ Module Tags
             </tags>
         </person>
     End Function
-
 End Module

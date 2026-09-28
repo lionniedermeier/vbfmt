@@ -1,5 +1,4 @@
 Module Airy
-
     Public Sub First()
         Dim a = 1
 
@@ -8,5 +7,4 @@ Module Airy
 
     Public Sub Second()
     End Sub
-
 End Module

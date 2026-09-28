@@ -1,5 +1,4 @@
 Module LeadingComments
-
     Public Sub HandlesAddHandler()
         ' Leading Trivia
         AddHandler SendButton.Click, AddressOf ExecuteSend
@@ -41,5 +40,4 @@ Module LeadingComments
         Dim value = 1
         ' A comment above the block's own closing statement.
     End Sub
-
 End Module

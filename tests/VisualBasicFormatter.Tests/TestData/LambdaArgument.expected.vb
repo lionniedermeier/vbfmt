@@ -1,5 +1,4 @@
 Public Class LambdaArguments
-
     Private ReadOnly _employees As New List(Of Employee)
 
     ' A block's body cannot be laid out behind the bracket that holds it: wherever the bracket
@@ -64,5 +63,4 @@ Public Class LambdaArguments
             End Sub
         )
     End Sub
-
 End Class

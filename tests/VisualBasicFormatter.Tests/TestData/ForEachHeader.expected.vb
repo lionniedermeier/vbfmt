@@ -1,5 +1,4 @@
 Module ForEachHeader
-
     Public Sub OnAChain(ByVal elementStore As ElementStore)
         For Each element In elementStore.
                 ResolvePrimaryElements().
@@ -36,5 +35,4 @@ Module ForEachHeader
             elementStore.Activate(i)
         Next
     End Sub
-
 End Module

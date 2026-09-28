@@ -1,5 +1,4 @@
 Module Calculations
-
     Public Function BreaksParametersBeforeTypeParameters(Of TValue, CValue, KValue)(
         paramA As Integer, paramB As Integer, genericParam As TValue
     ) As (ParamA As Integer, ParamB As Integer, GenericValue As TValue)
@@ -46,7 +45,6 @@ Module Calculations
     Public Delegate Function LongDelegateSignature(Of TValue, CValue, KValue)(
         paramA As Integer, paramB As Integer
     ) As Tuple(Of TValue, CValue, KValue)
-
 End Module
 
 Public Interface ICalculator

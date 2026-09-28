@@ -20,7 +20,6 @@ Public Class Tests
             Return 0
         End Get
     End Property
-
 End Class
 
 Public Class SingleWorker

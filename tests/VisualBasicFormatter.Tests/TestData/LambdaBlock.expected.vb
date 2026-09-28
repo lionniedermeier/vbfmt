@@ -1,5 +1,4 @@
 Public Class LambdaBlocks
-
     Public Sub RunsInParallel()
         Try
             Parallel.ForEach(
@@ -74,5 +73,4 @@ Public Class LambdaBlocks
                    Work()
                End Sub
     End Function
-
 End Class

@@ -2,7 +2,6 @@ Imports System.Xml.Linq
 
 ' Elements with text content: the whitespace there belongs to the author and stays untouched.
 Module Prose
-
     Public Function Paragraph(title As String) As XElement
         Return <document>
             <heading>
@@ -26,5 +25,4 @@ Module Prose
         Return <pre xml:space="preserve">   two   columns
    and    one   more</pre>
     End Function
-
 End Module

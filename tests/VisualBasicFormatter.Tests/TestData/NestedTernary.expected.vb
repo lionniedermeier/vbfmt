@@ -1,5 +1,4 @@
 Public Class EmployeeReport
-
     Private ReadOnly _employees As New List(Of String)
 
     Public Sub Report()
@@ -31,5 +30,4 @@ Public Class EmployeeReport
         ' commas break straight away.
         Dim plain = Math.Max(_employees.Count * 1000, _employees.Count * 2000 + _employees.Count * 3000 - 4000)
     End Sub
-
 End Class

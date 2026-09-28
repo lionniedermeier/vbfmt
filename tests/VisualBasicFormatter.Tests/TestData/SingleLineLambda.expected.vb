@@ -1,5 +1,4 @@
 Public Class SingleLineLambdas
-
     Public Sub BreaksAtTheCommaButKeepsTheDotFlat()
         AddHandler btn.Click,
             Sub(s, e) CollectionTypeStuff_____________________________________________________().Where(
@@ -64,5 +63,4 @@ Public Class SingleLineLambdas
             Function(row, column) container(row, column).Something______________________________()
         )
     End Sub
-
 End Class

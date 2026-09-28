@@ -1,5 +1,4 @@
 Module ParenthesizedConditions
-
     Public Function Classify(ByVal candidate As Contract) As String
         If (candidate.IsActive AndAlso candidate.HasValidSignature AndAlso candidate.RemainingTermInMonths > 0) Then
             Return "A"
@@ -94,5 +93,4 @@ Module ParenthesizedConditions
 
         Return False
     End Function
-
 End Module

@@ -14,12 +14,11 @@ internal static class MemberSpacingRule
         SyntaxList<StatementSyntax> members,
         SyntaxNode footer,
         VbDocVisitor visitor,
-        FormatContext context
+        FormatContext context,
+        bool padded = false
     )
     {
         using var body = new DocListBuilder(2 * (preamble.Count + members.Count));
-
-        var padded = members.Count > 1 && !AllProperties(members);
 
         StatementSyntax? previous = null;
 
@@ -40,7 +39,7 @@ internal static class MemberSpacingRule
         return Doc.Concat(
             header,
             Doc.Indent(body.ToDoc()),
-            BlockRule.Footer(footer, visitor, context, BeforeFooter(padded))
+            BlockRule.Footer(footer, visitor, context, padded ? Doc.EmptyLine : Doc.HardLine)
         );
     }
 
@@ -59,21 +58,6 @@ internal static class MemberSpacingRule
             InheritsStatementSyntax or ImplementsStatementSyntax => Doc.EmptyLine,
             _ => Between(previous, member, context),
         };
-
-    private static Doc BeforeFooter(bool padded) => padded ? Doc.EmptyLine : Doc.HardLine;
-
-    private static bool AllProperties(SyntaxList<StatementSyntax> members)
-    {
-        foreach (var member in members)
-        {
-            if (member is not PropertyStatementSyntax)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     private static bool IsSeparated(SyntaxNode member) =>
         member

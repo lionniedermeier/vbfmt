@@ -1,5 +1,4 @@
 Module SingleArgument
-
     Public Sub Bounds()
         Dim newNonZeroWidthTokenTriviaCount(
             triviaToMoveIndex - triviaToMoveCount - 1
@@ -35,5 +34,4 @@ Module SingleArgument
     Public Sub Empty()
         Foo()
     End Sub
-
 End Module

@@ -28,5 +28,4 @@ Module IgnoreComment
     Public Sub AfterIgnored()
         Dim z = 5
     End Sub
-
 End Module

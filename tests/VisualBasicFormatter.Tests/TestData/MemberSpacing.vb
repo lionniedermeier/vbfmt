@@ -33,6 +33,17 @@ Namespace Tracker.Single
     End Class
 End Namespace
 
+Namespace Tracker.Multi
+    Public Class First
+        Public Sub Run()
+        End Sub
+    End Class
+    Public Class Second
+        Public Sub Run()
+        End Sub
+    End Class
+End Namespace
+
 Namespace Tracker.Empty
 End Namespace
 
