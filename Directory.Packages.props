@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.6.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="5.6.0" />
     <PackageVersion Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.10" />
     <PackageVersion Include="System.CommandLine" Version="2.0.10" />
@@ -19,6 +19,6 @@
     <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <!-- BenchmarkDotNet drags in an older Roslyn; pin the shared assembly to the engine's version. -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.6.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />
   </ItemGroup>
 </Project>
