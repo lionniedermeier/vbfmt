@@ -270,7 +270,11 @@ internal sealed partial class VbDocVisitor
         }
 
         return Doc.Concat(
-            StructuralFallback.Run(modifiers.Select(token => (SyntaxNodeOrToken)token), this, _context),
+            StructuralFallback.Run(
+                modifiers.Select(token => (SyntaxNodeOrToken)token),
+                this,
+                _context
+            ),
             _context.Gap(modifiers[^1], declarators[0]),
             VbDocBuilder.Run(declarators, this, _context)
         );

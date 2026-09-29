@@ -109,9 +109,19 @@ internal static class BinaryExpressionRule
             items.Add(Separator(operators[i], preserved, context));
         }
 
-        var run = VbDocBuilder.Run(items.DrainToImmutable(), indent: !isNested);
+        var all = items.DrainToImmutable();
+        var run = VbDocBuilder.Run(all, indent: !isNested);
 
-        return !isNested && BlockHeader.IsHeaderExpression(node) ? Doc.Indent(run) : run;
+        if (isNested)
+        {
+            return run;
+        }
+
+        var single = Doc.Group(
+            Doc.Concat(all[0], Doc.Indent(Doc.Concat(all.RemoveAt(0))))
+        );
+
+        return BlockHeader.Wrap(node, run, single);
     }
 
     private static Doc Separator(SyntaxToken op, bool preserved, FormatContext context)

@@ -23,6 +23,7 @@ internal sealed class DocPrinter
 
     private int _column;
     private int _lineStart;
+    private int _rootBreaks;
 
     private DocPrinter(PrintOptions options) => _options = options;
 
@@ -111,6 +112,25 @@ internal sealed class DocPrinter
                 );
                 break;
 
+            case DocDedentToRoot dedent:
+                _commands.Push(
+                    command with
+                    {
+                        Indent = command.Root ?? command.Indent,
+                        AtRoot = command.Root is not null,
+                        Doc = dedent.Content,
+                    }
+                );
+                break;
+
+            case DocRootChoice rootChoice:
+                PrintRootChoice(command, rootChoice);
+                break;
+
+            case DocWholeFit wholeFit:
+                _commands.Push(command with { Doc = wholeFit.Content });
+                break;
+
             case DocGroup group:
                 _commands.Push(
                     command with
@@ -192,9 +212,14 @@ internal sealed class DocPrinter
     {
         for (var i = 0; i < choice.States.Length - 1; i++)
         {
+            if (command.InFallback && choice.States[i] is DocWholeFit)
+            {
+                continue;
+            }
+
             var state = command with { Mode = PrintMode.Flat, Doc = choice.States[i] };
 
-            if (Fits(state, declaredBreaksOnly: true))
+            if (Fits(state, declaredBreaksOnly: true, wholeFit: state.Doc is DocWholeFit))
             {
                 _commands.Push(state);
                 return;
@@ -202,6 +227,41 @@ internal sealed class DocPrinter
         }
 
         _commands.Push(command with { Mode = PrintMode.Break, Doc = choice.States[^1] });
+    }
+
+    private void PrintRootChoice(Command command, DocRootChoice choice)
+    {
+        var root = command with { Root = command.Indent, AtRoot = false };
+        var depth = _commands.Count;
+        var lineStart = _lineStart;
+        var column = _column;
+        var lineText = _output.ToString(lineStart, _output.Length - lineStart);
+        var suffixes = _lineSuffixes.ToArray();
+        var breaksBefore = _rootBreaks;
+
+        _rootBreaks = 0;
+        _commands.Push(root with { Doc = choice.Preferred });
+
+        while (_commands.Count > depth)
+        {
+            Step(_commands.Pop());
+        }
+
+        var broke = _rootBreaks > 0;
+        _rootBreaks = breaksBefore;
+
+        if (!broke)
+        {
+            return;
+        }
+
+        _output.Length = lineStart;
+        _output.Append(lineText);
+        _lineStart = lineStart;
+        _column = column;
+        _lineSuffixes.Clear();
+        _lineSuffixes.AddRange(suffixes);
+        _commands.Push(root with { InFallback = true, Doc = choice.Fallback });
     }
 
     private void PrintLine(Command command, DocLine line)
@@ -222,6 +282,11 @@ internal sealed class DocPrinter
             _commands.Push(command);
             PushLineSuffixes();
             return;
+        }
+
+        if (command.AtRoot)
+        {
+            _rootBreaks++;
         }
 
         if (line.Kind == LineKind.Empty)
@@ -327,7 +392,8 @@ internal sealed class DocPrinter
     /// ending the measurement at one of its breaks would accept a layout that then overruns. Applies
     /// to <paramref name="next"/> only, never to the commands already queued behind it.
     /// </param>
-    private bool Fits(Command next, bool declaredBreaksOnly = false)
+    /// <param name="wholeFit">Continue measuring after a break inside <paramref name="next"/>.</param>
+    private bool Fits(Command next, bool declaredBreaksOnly = false, bool wholeFit = false)
     {
         if (_column > _options.PrintWidth)
         {
@@ -384,7 +450,25 @@ internal sealed class DocPrinter
                     break;
 
                 case DocIndent indent:
-                    queue.Push(command with { Doc = indent.Content });
+                    queue.Push(
+                        command with
+                        {
+                            Indent = wholeFit && !inRest ? Deeper(command.Indent) : command.Indent,
+                            Doc = indent.Content,
+                        }
+                    );
+                    break;
+
+                case DocDedentToRoot dedent:
+                    queue.Push(command with { Doc = dedent.Content });
+                    break;
+
+                case DocRootChoice rootChoice:
+                    queue.Push(command with { Doc = rootChoice.Preferred });
+                    break;
+
+                case DocWholeFit whole:
+                    queue.Push(command with { Doc = whole.Content });
                     break;
 
                 case DocAlign align:
@@ -430,6 +514,17 @@ internal sealed class DocPrinter
                     break;
 
                 case DocLine line:
+                    if (
+                        wholeFit
+                        && !inRest
+                        && command.Mode == PrintMode.Break
+                        && line.Kind is LineKind.Soft or LineKind.Space
+                    )
+                    {
+                        column = command.Indent.Width;
+                        break;
+                    }
+
                     if (
                         command.Mode == PrintMode.Break
                         || line.Kind is LineKind.Hard or LineKind.Empty
@@ -539,5 +634,12 @@ internal sealed class DocPrinter
         _output.Length = end;
     }
 
-    private readonly record struct Command(Indentation Indent, PrintMode Mode, Doc Doc);
+    private readonly record struct Command(
+        Indentation Indent,
+        PrintMode Mode,
+        Doc Doc,
+        Indentation? Root = null,
+        bool AtRoot = false,
+        bool InFallback = false
+    );
 }

@@ -148,9 +148,10 @@ internal static class TriviaPrinter
         }
 
         var closingBreak =
-            lastContentIndex < blankAfter ? Doc.EmptyLine
-            : ClosingRegionBreak(trivia[lastContentIndex], beforeFooter)
-                ?? (blankLines > 0 ? Doc.EmptyLine : Doc.HardLine);
+            lastContentIndex < blankAfter
+                ? Doc.EmptyLine
+                : ClosingRegionBreak(trivia[lastContentIndex], beforeFooter)
+                    ?? (blankLines > 0 ? Doc.EmptyLine : Doc.HardLine);
 
         return (Doc.Concat(parts.DrainToImmutable()), closingBreak);
     }

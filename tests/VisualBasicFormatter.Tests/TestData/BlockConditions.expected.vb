@@ -100,10 +100,45 @@ Module BlockConditions
 
     Public Function LongChainedDotCall(ByVal candidate As Contract) As Boolean
         If candidate.PrimaryAccountHolderRecord.LinkedSubscriptionRegistrationEntry.
-                CurrentRenewalConfigurationSettings.
-                EvaluatesEligibilityForAutomaticRenewalRightNow(
-                    candidate.PrimaryHolderName, candidate.SecondaryHolderName
-                ) Then
+            CurrentRenewalConfigurationSettings.
+            EvaluatesEligibilityForAutomaticRenewalRightNow(
+                candidate.PrimaryHolderName, candidate.SecondaryHolderName
+        ) Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Public Function ClosingCallOfAChain(ByVal candidate As Contract) As Boolean
+        If Ident_______________.Long_______________.Prop____________________________________.Method1(
+                    param1_____________________________, param2_______________________________________
+                ) AndAlso
+                Ident2.Chain_______________________.
+                Method2(param1_______________________________, param2_____________________________________) Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Public Function ClosingCallThatFitsOnItsOwnLine(ByVal candidate As Contract) As Boolean
+        If first____________________________________________________________ AndAlso
+                second____________________________________________________________ AndAlso
+                Short_.
+                Call(param1_______________________, param2_______________________, param3_______________________) Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Public Function ClosingCallThatDoesNot(ByVal candidate As Contract) As Boolean
+        If first____________________________________________________________ AndAlso
+            second____________________________________________________________ AndAlso
+            Short_.Call(
+                param1__________________________, param2__________________________, param3__________________________
+        ) Then
             Return True
         End If
 

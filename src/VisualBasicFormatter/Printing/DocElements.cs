@@ -223,3 +223,45 @@ internal sealed class DocFill : Doc
 
     internal override bool Expands { get; }
 }
+
+internal sealed class DocDedentToRoot : Doc
+{
+    internal DocDedentToRoot(Doc content)
+    {
+        Content = content;
+        Expands = content.Expands;
+    }
+
+    internal Doc Content { get; }
+
+    internal override bool Expands { get; }
+}
+
+internal sealed class DocRootChoice : Doc
+{
+    internal DocRootChoice(Doc preferred, Doc fallback)
+    {
+        Preferred = preferred;
+        Fallback = fallback;
+        Expands = preferred.Expands;
+    }
+
+    internal Doc Preferred { get; }
+
+    internal Doc Fallback { get; }
+
+    internal override bool Expands { get; }
+}
+
+internal sealed class DocWholeFit : Doc
+{
+    internal DocWholeFit(Doc content)
+    {
+        Content = content;
+        Expands = content.Expands;
+    }
+
+    internal Doc Content { get; }
+
+    internal override bool Expands { get; }
+}

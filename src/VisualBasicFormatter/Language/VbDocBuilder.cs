@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
+using VisualBasicFormatter.Language.Statements;
 using VisualBasicFormatter.Printing;
 
 namespace VisualBasicFormatter.Language;
@@ -314,6 +315,7 @@ internal static class VbDocBuilder
     )
     {
         var body = Doc.Concat(items);
+        var closeBreak = context.SoftBreakBefore(close);
 
         return Doc.Concat(
             context.Token(open),
@@ -321,7 +323,7 @@ internal static class VbDocBuilder
                 context.SoftBreakAfter(open),
                 layout == ListLayout.Packed ? Doc.Group(body) : body
             ),
-            context.SoftBreakBefore(close),
+            BlockHeader.ClosesHeader(close) ? Doc.DedentToRoot(closeBreak) : closeBreak,
             context.Token(close)
         );
     }

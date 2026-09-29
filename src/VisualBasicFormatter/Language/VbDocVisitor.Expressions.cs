@@ -211,7 +211,7 @@ internal sealed partial class VbDocVisitor
 
         var run = VbDocBuilder.Run(StructuralFallback.Format(node, this, _context));
 
-        return BlockHeader.IsHeaderExpression(node) ? Doc.Indent(run) : run;
+        return BlockHeader.Wrap(node, run, run);
     }
 
     /// <summary>

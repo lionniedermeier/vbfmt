@@ -180,6 +180,15 @@ internal abstract class Doc
     /// <inheritdoc cref="Align(Doc)"/>
     public static Doc Align(params Doc[] parts) => Align(Concat(parts));
 
+    public static Doc DedentToRoot(Doc content) =>
+        content is DocNothing ? Nothing : new DocDedentToRoot(content);
+
+    public static Doc WholeFit(Doc content) =>
+        content is DocNothing ? Nothing : new DocWholeFit(content);
+
+    public static Doc RootChoice(Doc preferred, Doc fallback) =>
+        new DocRootChoice(preferred, fallback);
+
     /// <summary>Emits <paramref name="whenBroken"/> or <paramref name="whenFlat"/> per the group's mode.</summary>
     public static Doc Conditional(Doc whenBroken, Doc whenFlat) =>
         whenBroken is DocNothing && whenFlat is DocNothing

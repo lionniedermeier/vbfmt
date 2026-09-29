@@ -158,11 +158,29 @@ internal static class MemberChainRule
                 tail,
             ]);
 
-            return BlockHeader.IsHeaderExpression(node) ? Doc.Indent(fallback) : fallback;
+            return BlockHeader.Wrap(node, fallback, fallback);
         }
 
         var states = ImmutableArray.CreateBuilder<Doc>(4);
         states.Add(Doc.Concat(headDoc, context.Token(dot), tail));
+
+        if (
+            node.ArgumentList is { } arguments
+            && !BlockHeader.IsHeaderExpression(node)
+            && BlockHeader.ClosesHeader(arguments.CloseParenToken)
+        )
+        {
+            states.Add(
+                Doc.WholeFit(
+                    Doc.Concat(
+                        headDoc,
+                        context.Token(dot),
+                        Doc.Group(context.SoftBreakAfter(dot), shouldBreak: true),
+                        tail
+                    )
+                )
+            );
+        }
 
         if (Doc.ForceBreak(tail) is { } argsBroken)
         {
@@ -176,7 +194,7 @@ internal static class MemberChainRule
 
         var dotBroken = DotBroken(head, dot, headDoc, tail, visitor, context);
 
-        states.Add(BlockHeader.IsHeaderExpression(node) ? Doc.Indent(dotBroken) : dotBroken);
+        states.Add(BlockHeader.Wrap(node, dotBroken, dotBroken));
 
         return Doc.ConditionalGroup(states.DrainToImmutable());
     }

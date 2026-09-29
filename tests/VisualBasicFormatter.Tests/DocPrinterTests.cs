@@ -22,6 +22,50 @@ public sealed class DocPrinterTests
     private static string Print(Doc document, PrintOptions? options = null) =>
         DocPrinter.Print(document, options ?? Options());
 
+    private static Doc RootChoiceDoc(string tail) =>
+        Doc.Concat(
+            Doc.Text("If "),
+            Doc.RootChoice(
+                Doc.Indent(
+                    Doc.Concat(
+                        Doc.Text("a("),
+                        Doc.Indent(Doc.HardLine, Doc.Text(tail)),
+                        Doc.DedentToRoot(Doc.HardLine),
+                        Doc.Text(")")
+                    )
+                ),
+                Doc.Text("fallback")
+            )
+        );
+
+    [Fact]
+    public void RootChoiceTakesTheFallbackWhenTheRootBreaks()
+    {
+        Assert.Equal("If fallback", Print(RootChoiceDoc("x")));
+    }
+
+    [Fact]
+    public void RootChoiceKeepsThePreferredWhenNothingBreaksAtTheRoot()
+    {
+        var doc = Doc.Concat(
+            Doc.Text("If "),
+            Doc.RootChoice(
+                Doc.Indent(Doc.Concat(Doc.Text("a"), Doc.HardLine, Doc.Text("b"))),
+                Doc.Text("fallback")
+            )
+        );
+
+        Assert.Equal("If a\n    b", Print(doc));
+    }
+
+    [Fact]
+    public void DedentToRootWithoutARootChangesNothing()
+    {
+        var doc = Doc.Indent(Doc.Concat(Doc.Text("a"), Doc.DedentToRoot(Doc.HardLine), Doc.Text("b")));
+
+        Assert.Equal("a\n    b", Print(doc));
+    }
+
     [Fact]
     public void PrintsAGroupFlatWhenItFits()
     {

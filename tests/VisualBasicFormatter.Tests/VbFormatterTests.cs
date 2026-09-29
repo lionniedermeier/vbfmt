@@ -927,6 +927,39 @@ public sealed class VbFormatterTests
     }
 
     [Fact]
+    public void BreaksBeforeTheLastCallOfAHeaderWhenItFitsOnItsOwnLine()
+    {
+        var lines = Lines("BlockConditions");
+
+        var head = Array.FindIndex(
+            lines,
+            l => l.Trim() == "Short_."
+        );
+
+        Assert.True(head >= 0);
+        Assert.Equal(Indent(lines[head]), Indent(lines[head + 1]));
+        Assert.StartsWith("Call(", lines[head + 1].TrimStart());
+        Assert.EndsWith("Then", lines[head + 1].TrimEnd());
+    }
+
+    [Fact]
+    public void PutsTheFinalCloserOfAWrappedHeaderOnTheHeaderColumn()
+    {
+        var lines = Lines("BlockConditions");
+
+        var head = Array.FindIndex(lines, l => l.Trim().StartsWith("If first", StringComparison.Ordinal));
+        head = Array.FindIndex(lines, head + 1, l => l.Trim().StartsWith("If first", StringComparison.Ordinal));
+
+        Assert.True(head >= 0);
+        var close = Array.FindIndex(lines, head, l => l.Trim() == ") Then");
+
+        Assert.True(close > head);
+        Assert.Equal(Indent(lines[head]), Indent(lines[close]));
+        Assert.Equal(Indent(lines[head]) + 4, Indent(lines[head + 1]));
+        Assert.Equal(Indent(lines[head]) + 4, Indent(lines[close + 1]));
+    }
+
+    [Fact]
     public void LeavesABracketedConditionOnTheHeaderColumn()
     {
         var lines = Lines("BlockConditions");
