@@ -93,7 +93,6 @@ Public Class WithRegion
 
 #Region "Helpers"
     Private _b As Integer
-
 #End Region
 
     ' A plain comment above a method.

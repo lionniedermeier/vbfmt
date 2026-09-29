@@ -37,8 +37,8 @@ internal static class BlockRule
             return Doc.Nothing;
         }
 
-        separator ??= context.Separator(footer);
         var first = footer.GetFirstToken();
+        separator = TriviaPrinter.RegionSeparator(first, true) ?? separator ?? context.Separator(footer);
 
         if (context.IsIgnored(footer))
         {

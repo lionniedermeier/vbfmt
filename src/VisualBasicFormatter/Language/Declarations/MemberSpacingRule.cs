@@ -44,7 +44,8 @@ internal static class MemberSpacingRule
     }
 
     public static Doc Between(SyntaxNode previous, SyntaxNode next, FormatContext context) =>
-        IsSeparated(previous) || IsSeparated(next) ? Doc.EmptyLine : context.Separator(next);
+        TriviaPrinter.RegionSeparator(next.GetFirstToken(), true)
+        ?? (IsSeparated(previous) || IsSeparated(next) ? Doc.EmptyLine : context.Separator(next));
 
     private static Doc BeforeMember(
         StatementSyntax? previous,
@@ -55,6 +56,8 @@ internal static class MemberSpacingRule
         previous switch
         {
             null => padded && !IsDocumented(member) ? Doc.EmptyLine : Doc.HardLine,
+            _ when TriviaPrinter.RegionSeparator(member.GetFirstToken(), true) is { } region =>
+                region,
             InheritsStatementSyntax or ImplementsStatementSyntax => Doc.EmptyLine,
             _ => Between(previous, member, context),
         };

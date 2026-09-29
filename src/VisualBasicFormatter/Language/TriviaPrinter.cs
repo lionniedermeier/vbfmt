@@ -20,26 +20,83 @@ internal static class TriviaPrinter
     /// <see cref="BlankLinesBefore(SyntaxToken)"/> instead.
     /// </summary>
     public static Doc Leading(SyntaxToken token, FormatContext context) =>
-        Leading(token.LeadingTrivia, token.LeadingTrivia.Count, context);
+        Leading(
+            token.LeadingTrivia,
+            token.LeadingTrivia.Count,
+            context,
+            beforeFooter: token.IsKind(SyntaxKind.EndOfFileToken)
+        );
 
     public static Doc Leading(
         SyntaxTriviaList trivia,
         int count,
         FormatContext context,
-        int blankAfter = -1
+        int blankAfter = -1,
+        bool beforeFooter = false
     )
     {
-        var (content, closingBreak) = Split(trivia, count, blankAfter);
+        var (content, closingBreak) = Split(trivia, count, blankAfter, beforeFooter);
         return Doc.Concat(content, closingBreak);
     }
 
+    public static Doc? RegionSeparator(SyntaxToken token, bool hasPrevious)
+    {
+        foreach (var trivia in token.LeadingTrivia)
+        {
+            if (Content(trivia) is null)
+            {
+                continue;
+            }
+
+            return trivia.IsKind(SyntaxKind.EndRegionDirectiveTrivia) ? Doc.HardLine
+                : hasPrevious && trivia.IsKind(SyntaxKind.RegionDirectiveTrivia) ? Doc.EmptyLine
+                : null;
+        }
+
+        return null;
+    }
+
+    private static Doc? RegionBreak(SyntaxTrivia previous, SyntaxTrivia current, bool beforeFooter)
+    {
+        if (
+            current.IsKind(SyntaxKind.EndRegionDirectiveTrivia)
+            || previous.IsKind(SyntaxKind.RegionDirectiveTrivia)
+        )
+        {
+            return Doc.HardLine;
+        }
+
+        if (!previous.IsKind(SyntaxKind.EndRegionDirectiveTrivia))
+        {
+            return null;
+        }
+
+        return beforeFooter ? null : Doc.EmptyLine;
+    }
+
+    private static Doc? ClosingRegionBreak(SyntaxTrivia last, bool beforeFooter)
+    {
+        if (last.IsKind(SyntaxKind.RegionDirectiveTrivia))
+        {
+            return Doc.HardLine;
+        }
+
+        if (!last.IsKind(SyntaxKind.EndRegionDirectiveTrivia))
+        {
+            return null;
+        }
+
+        return beforeFooter ? Doc.HardLine : Doc.EmptyLine;
+    }
+
     public static (Doc Content, Doc Break) Dangling(SyntaxToken token) =>
-        Split(token.LeadingTrivia, token.LeadingTrivia.Count, -1);
+        Split(token.LeadingTrivia, token.LeadingTrivia.Count, -1, true);
 
     private static (Doc Content, Doc Break) Split(
         SyntaxTriviaList trivia,
         int count,
-        int blankAfter
+        int blankAfter,
+        bool beforeFooter
     )
     {
         // The overwhelmingly common case: indentation and blank lines only, nothing to print above
@@ -76,7 +133,12 @@ internal static class TriviaPrinter
             if (written)
             {
                 var forced = lastContentIndex < blankAfter && i >= blankAfter;
-                parts.Add(blankLines > 0 || forced ? Doc.EmptyLine : Doc.HardLine);
+                parts.Add(
+                    forced
+                        ? Doc.EmptyLine
+                        : RegionBreak(trivia[lastContentIndex], current, beforeFooter)
+                            ?? (blankLines > 0 ? Doc.EmptyLine : Doc.HardLine)
+                );
             }
 
             parts.Add(content);
@@ -86,7 +148,9 @@ internal static class TriviaPrinter
         }
 
         var closingBreak =
-            blankLines > 0 || lastContentIndex < blankAfter ? Doc.EmptyLine : Doc.HardLine;
+            lastContentIndex < blankAfter ? Doc.EmptyLine
+            : ClosingRegionBreak(trivia[lastContentIndex], beforeFooter)
+                ?? (blankLines > 0 ? Doc.EmptyLine : Doc.HardLine);
 
         return (Doc.Concat(parts.DrainToImmutable()), closingBreak);
     }
