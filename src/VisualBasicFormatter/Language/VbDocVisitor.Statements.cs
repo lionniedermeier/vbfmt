@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using VisualBasicFormatter.Language.Declarations;
 using VisualBasicFormatter.Language.Module;
@@ -242,6 +243,36 @@ internal sealed partial class VbDocVisitor
             _context.Token(node.ImplementsKeyword),
             Doc.Space,
             VbDocBuilder.Run(node.Types, this, _context)
+        );
+    }
+
+    public override Doc VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node) =>
+        FormatDeclarators(node, node.Modifiers, node.Declarators);
+
+    public override Doc VisitFieldDeclaration(FieldDeclarationSyntax node) =>
+        node.AttributeLists.Count == 0
+            ? FormatDeclarators(node, node.Modifiers, node.Declarators)
+            : StructuralFallback.Format(node, this, _context);
+
+    private Doc FormatDeclarators(
+        SyntaxNode node,
+        SyntaxTokenList modifiers,
+        SeparatedSyntaxList<VariableDeclaratorSyntax> declarators
+    )
+    {
+        if (
+            declarators.SeparatorCount == 0
+            || modifiers.Count == 0
+            || _context.MustPrintVerbatim(node)
+        )
+        {
+            return StructuralFallback.Format(node, this, _context);
+        }
+
+        return Doc.Concat(
+            StructuralFallback.Run(modifiers.Select(token => (SyntaxNodeOrToken)token), this, _context),
+            _context.Gap(modifiers[^1], declarators[0]),
+            VbDocBuilder.Run(declarators, this, _context)
         );
     }
 
