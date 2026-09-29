@@ -70,12 +70,14 @@ internal static class MemberSpacingRule
                 or TypeBlockSyntax
                 or EnumBlockSyntax
                 or NamespaceBlockSyntax
-                or MethodStatementSyntax
                 or SubNewStatementSyntax
                 or OperatorStatementSyntax
                 or DeclareStatementSyntax
                 or DelegateStatementSyntax
-                or EventStatementSyntax
+        || (
+            member is MethodStatementSyntax or EventStatementSyntax
+            && member.Parent is not InterfaceBlockSyntax
+        )
         || IsDocumented(member);
 
     private static bool IsDocumented(SyntaxNode member)

@@ -62,12 +62,32 @@ End Class
 
 Public Interface IWorker
     Sub Run()
-
     Function Compute() As Integer
-
     Property Total As Integer
-
     Event Done As EventHandler
+End Interface
+
+Public Interface IMixed
+    Inherits IDisposable
+
+    Sub First()
+    Sub Second()
+
+    Sub Third()
+
+    ''' <summary>
+    ''' An xml doccomment
+    ''' </summary>
+    Sub Fourth()
+
+    Sub Fifth()
+End Interface
+
+Public Interface IDocumentedFirst
+    ''' <summary>
+    ''' An xml doccomment
+    ''' </summary>
+    Sub Run()
 End Interface
 
 Public MustInherit Class WorkerBase
