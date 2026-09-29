@@ -10,4 +10,10 @@ Module Selection
                     visited.Contains(State.Companies(g.MergerId))
             )
     End Sub
+
+    Public Sub CollectSingleDot()
+        Dim isEligible = candidate.PrimaryAccountHolderRecord.LinkedSubscriptionRegistrationEntry.
+            CurrentRenewalConfigurationSettings.
+            EvaluatesEligibilityForAutomaticRenewalRightNow(candidate.PrimaryHolderName, candidate.SecondaryHolderName)
+    End Sub
 End Module

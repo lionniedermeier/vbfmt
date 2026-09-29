@@ -84,4 +84,29 @@ Module BlockConditions
 
         Return False
     End Function
+
+    Public Function SingleDotCall(ByVal candidate As Contract) As Boolean
+        If candidate.EvaluateEligibility(
+            candidate.PrimaryHolderName,
+            candidate.SecondaryHolderName,
+            candidate.BranchName,
+            candidate.ProductProgramName
+        ) Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Public Function LongChainedDotCall(ByVal candidate As Contract) As Boolean
+        If candidate.PrimaryAccountHolderRecord.LinkedSubscriptionRegistrationEntry.
+                CurrentRenewalConfigurationSettings.
+                EvaluatesEligibilityForAutomaticRenewalRightNow(
+                    candidate.PrimaryHolderName, candidate.SecondaryHolderName
+                ) Then
+            Return True
+        End If
+
+        Return False
+    End Function
 End Module

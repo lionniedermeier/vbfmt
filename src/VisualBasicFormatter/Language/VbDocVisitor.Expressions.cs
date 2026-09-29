@@ -198,7 +198,7 @@ internal sealed partial class VbDocVisitor
                 var fill = MemberChainRule.LastResortDot(node, this, _context);
                 _insideLastResortDot = wasInside;
 
-                return BlockHeader.IsHeaderExpression(node) ? Doc.Indent(fill) : fill;
+                return fill;
             }
 
             return StructuralFallback.Format(node, this, _context);

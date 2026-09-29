@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using VisualBasicFormatter.Language.Statements;
 using VisualBasicFormatter.Printing;
 
 namespace VisualBasicFormatter.Language.Expressions;
@@ -137,6 +138,7 @@ internal static class MemberChainRule
     {
         var access = (MemberAccessExpressionSyntax)node.Expression!;
         var dot = access.OperatorToken;
+        var head = access.Expression!;
 
         var tail = node.ArgumentList is null
             ? visitor.Format(access.Name)
@@ -146,10 +148,116 @@ internal static class MemberChainRule
                 visitor.Format(node.ArgumentList)
             );
 
-        return Doc.Fill([
-            Doc.Concat(visitor.Format(access.Expression!), context.Token(dot)),
-            Doc.Indent(context.SoftBreakAfter(dot)),
-            tail,
-        ]);
+        var headDoc = visitor.Format(head);
+
+        if (headDoc.Expands || tail.Expands)
+        {
+            var fallback = Doc.Fill([
+                Doc.Concat(headDoc, context.Token(dot)),
+                Doc.Indent(context.SoftBreakAfter(dot)),
+                tail,
+            ]);
+
+            return BlockHeader.IsHeaderExpression(node) ? Doc.Indent(fallback) : fallback;
+        }
+
+        var states = ImmutableArray.CreateBuilder<Doc>(4);
+        states.Add(Doc.Concat(headDoc, context.Token(dot), tail));
+
+        if (Doc.ForceBreak(tail) is { } argsBroken)
+        {
+            states.Add(Doc.Concat(headDoc, context.Token(dot), argsBroken));
+        }
+
+        if (Doc.ForceBreak(headDoc) is { } headBroken)
+        {
+            states.Add(Doc.Concat(headBroken, context.Token(dot), tail));
+        }
+
+        var dotBroken = DotBroken(head, dot, headDoc, tail, visitor, context);
+
+        states.Add(BlockHeader.IsHeaderExpression(node) ? Doc.Indent(dotBroken) : dotBroken);
+
+        return Doc.ConditionalGroup(states.DrainToImmutable());
+    }
+
+    private static Doc DotBroken(
+        ExpressionSyntax head,
+        SyntaxToken dot,
+        Doc headDoc,
+        Doc tail,
+        VbDocVisitor visitor,
+        FormatContext context
+    )
+    {
+        if (TryGetHops(head, context, out var root, out var hops))
+        {
+            using var parts = new DocListBuilder(2 * (hops.Length + 1) + 1);
+
+            parts.Add(Doc.Concat(visitor.Format(root), context.Token(hops[0].Dot)));
+            parts.Add(context.SoftBreakAfter(hops[0].Dot));
+
+            for (var i = 1; i < hops.Length; i++)
+            {
+                parts.Add(Doc.Concat(visitor.Format(hops[i - 1].Name), context.Token(hops[i].Dot)));
+                parts.Add(context.SoftBreakAfter(hops[i].Dot));
+            }
+
+            parts.Add(Doc.Concat(visitor.Format(hops[^1].Name), context.Token(dot)));
+            parts.Add(context.SoftBreakAfter(dot));
+            parts.Add(tail);
+
+            return Doc.Indent(Doc.Fill(parts.ToImmutable(), strict: true));
+        }
+
+        return Doc.Indent(
+            Doc.Fill(
+                [Doc.Concat(headDoc, context.Token(dot)), context.SoftBreakAfter(dot), tail],
+                strict: true
+            )
+        );
+    }
+
+    private static bool TryGetHops(
+        ExpressionSyntax head,
+        FormatContext context,
+        out ExpressionSyntax root,
+        out ImmutableArray<(SyntaxToken Dot, IdentifierNameSyntax Name)> hops
+    )
+    {
+        var found = new List<(SyntaxToken Dot, IdentifierNameSyntax Name)>();
+        var current = head;
+
+        while (
+            current is MemberAccessExpressionSyntax { Expression: not null } access
+            && access.Name is IdentifierNameSyntax name
+            && ContinuationPoints.IsImplicitAfter(access.OperatorToken, context.Unbreakable)
+        )
+        {
+            found.Add((access.OperatorToken, name));
+            current = access.Expression;
+        }
+
+        found.Reverse();
+
+        if (
+            found.Count == 0
+            || current
+                is not (
+                    IdentifierNameSyntax
+                    or MeExpressionSyntax
+                    or MyBaseExpressionSyntax
+                    or MyClassExpressionSyntax
+                )
+        )
+        {
+            root = head;
+            hops = [];
+            return false;
+        }
+
+        root = current;
+        hops = ImmutableCollectionsMarshal.AsImmutableArray(found.ToArray());
+        return true;
     }
 }
